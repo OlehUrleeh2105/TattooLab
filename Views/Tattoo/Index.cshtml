@@ -1,0 +1,142 @@
+@using System.Globalization
+@model TatooLab.Models.Views.TattoosView
+
+<div class="row mt-5">
+    <form asp-action="Index" method="get" class="form-inline row">
+        <div class="search-input form-group col-5">
+            <input type="text" placeholder="Search by title" id="searchText" name="searchString" value="@ViewBag.SearchString">
+        </div>
+
+        <div class="row col-7">
+            <label for="sortOrder" class="mt-2 col-2 text-center text-light">Sort by:</label>
+            <select class="col-3 form-control w-25 mx-3 text-light bg-dark" id="sortOrder" name="sortOrder">
+                <option value="Name" selected="@(ViewBag.Sort == "Name")">Title (A-Z)</option>
+                <option value="name_desc" selected="@(ViewBag.Sort == "name_desc")">Title (Z-A)</option>
+                <option value="Price" selected="@(ViewBag.Sort == "Price")">Price (ascending)</option>
+                <option value="price_desc" selected="@(ViewBag.Sort == "price_desc")">Price (descending)</option>
+            </select>
+            <div class="col-3">
+                <div class="form-check mt-3">
+                    <input class="form-check-input text-light bg-dark" type="checkbox" id="onlyFavorite" name="onlyFavorite" value="true" @(ViewData["OnlyFavorite"] != null && (bool)ViewData["OnlyFavorite"]! ? "checked" : "")>
+                    <label class="form-check-label text-light" for="onlyFavorite">Favorite</label>
+                </div>
+            </div>
+            <button type="submit" class="btn col-2 text-light bg-dark">Filter</button>
+        </div>
+    </form>
+</div>
+
+
+
+<div class="most-popular">
+    <div class="d-flex justify-content-evenly mt-5 row">
+        @foreach (var item in Model.Tattoos!)
+        {
+            <div class="col-lg-3 col-sm-6">
+                <div class="item">
+                    <div id="carouselExampleInterval{@item.Id}" class="carousel slide card-img-top" data-bs-ride="carousel"> 
+                        <div class="carousel-inner">
+                            @foreach (var image in item.TattooImages!)
+                            {
+                                <div class="carousel-item @(image == item.TattooImages.First() ? "active" : "")">
+                                    <img src="uploads/@image.ImageUrl" class="d-block w-100" alt="...">
+                                </div>
+                            }
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval{@item.Id}" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval{@item.Id}" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div> 
+                    <div class="item-text">
+                        <div class="item-details">
+                            <div class="item-detail">
+                                <h4 class="item-title">@item.Name</h4>
+                            </div>
+                            <div class="item-detail">
+                                <h4 class="item-title">@string.Format(new CultureInfo("en-US"), "{0:C}", item.Price)</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-between">
+                        <a class="btn bg-dark text-light @(Model.UserId != null ? "w-75" : "w-100")" asp-action="Detail" asp-controller="Tattoo" asp-route-id="@item.Id">
+                            <i class="fa-solid fa-circle-info"></i>
+                            View
+                        </a>
+                        @if (Model.UserId != null)
+                        {
+                            <button class="favorite-button no-border-button w-25"
+                                    data-user-id="@Model.UserId"
+                                    data-tattoo-id="@item.Id">
+                                <i class="@(item.IsFavorite ? "fa-solid" : "fa-regular")  fa-heart fa-2xl"
+                                   style="color: #e01b24;">
+                                </i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@if (Model.PaginationInfo?.TotalPages > 1)
+{
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Book Pagination">
+            <ul class="pagination">
+                @if (Model.PaginationInfo!.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?page=@(Model.PaginationInfo.CurrentPage - 1)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+                @for (var i = 1; i <= Model.PaginationInfo.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PaginationInfo.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+                @if (Model.PaginationInfo.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?page=@(Model.PaginationInfo.CurrentPage + 1)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $(".favorite-button").click(function () {
+                var userId = $(this).data("user-id");
+                var tattooId = $(this).data("tattoo-id");
+        
+                var button = $(this);
+                $.ajax({
+                    url: "@Url.Action("AddToFavorite")",
+                    type: "POST",
+                    data: { userId: userId, tattooId: tattooId },
+                    success: function () {
+                        var isFavorite = button.find("i").hasClass("fa-solid");
+                        button.find("i").toggleClass("fa-solid fa-regular");
+                        button.find("i").css("color", isFavorite ? "#e01b24" : "#e01b24");
+                    },
+                    error: function () {
+                        alert("Something is wrong(");
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,51 @@
+@model TatooLab.Models.Views.RegisterViewModel
+
+<div class="container w-50">
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
+            <form asp-action="Register" method="post">
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="LastName"></label>
+                    <input type="text" asp-for="LastName" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="FirstName"></label>
+                    <input type="text" asp-for="FirstName" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="MiddleName"></label>
+                    <input type="text" asp-for="MiddleName" class="form-control bg-custom text-light custom-input"/>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="Email"></label>
+                    <input type="email" asp-for="Email" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="Password"></label>
+                    <input type="password" asp-for="Password" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="ConfirmPassword"></label>
+                    <input type="password" asp-for="ConfirmPassword" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+                <div class="row justify-content-center">
+                    <button type="submit" class="btn bg-custom text-light border-light border-1 btn-block mb-4 w-25">Sign up</button>
+                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

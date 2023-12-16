@@ -1,0 +1,75 @@
+@using System.Globalization
+@model TatooLab.Models.Views.DetailsView
+
+<div class="row my-5">
+    <div class="col-6 mx-3">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                @for (int i = 0; i < Model.Tattoo?.TattooImages?.Count(); i++)
+                {
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="true" aria-label="Slide @i"></button>
+                }
+            </div>
+            <div class="carousel-inner">
+                @foreach (var image in Model.Tattoo?.TattooImages!)
+                {
+                    <div class="carousel-item @(image == Model.Tattoo?.TattooImages.First() ? "active" : "")">
+                        <img src="@Url.Content("~/uploads/" + image.ImageUrl)" class="d-block w-100" alt="Tattoo">
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="row">
+            <div class="row d-flex align-items-center">
+                <h2 class="display-4 col text-light">@Model.Tattoo?.Name</h2>
+                @if (Model.UserId != null)
+                {
+                    <button class="favorite-button col-2 no-border-button" data-user-id="@Model.UserId">
+                        <i class="@(Model.Favorite == true ? "fa-solid" : "fa-regular")  fa-heart fa-2xl" style="color: #e01b24;"></i>
+                    </button>
+                }
+            </div>
+            <p class="lead text-light">@Model.Tattoo?.Description</p>
+            <p class="h3 text-light">@string.Format(new CultureInfo("uk-UA"), "{0:C}", Model.Tattoo?.Price)</p>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+
+            $(".favorite-button").click(function () {
+                var userId = $(this).data("user-id");
+                var tattooId = @Model.Tattoo?.Id;
+                var button = $(this);
+
+                $.ajax({
+                    url: "@Url.Action("AddToFavorite")",
+                    type: "POST",
+                    data: { userId: userId, tattooId: tattooId },
+                    success: function () {
+                        var isFavorite = button.find("i").hasClass("fa-solid");
+                        button.find("i").toggleClass("fa-solid fa-regular");
+                        button.find("i").css("color", isFavorite ? "#e01b24" : "#e01b24");
+                    },
+                    error: function () {
+                        alert("Something is wrong(");
+                    }
+                });
+                
+            });
+        });
+
+    </script>
+}

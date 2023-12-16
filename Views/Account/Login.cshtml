@@ -1,0 +1,35 @@
+@model TatooLab.Models.Views.LoginViewModel
+
+
+<div class="container w-50">
+    <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="tab-login">
+            <form asp-action="Login" method="post" class="bg-custom ">
+                <div asp-validation-summary="All"></div>
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="Email"></label>
+                    <input type="email" asp-for="Email" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-outline mb-4">
+                    <label class="form-label text-light" asp-for="Password"></label>
+                    <input type="password" asp-for="Password" class="form-control bg-custom text-light custom-input"/>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-4 mx-1">
+                        <div class="form-check mb-3 mb-md-0">
+                            <input class="form-check-input text-light bg-dark" asp-for="RememberMe" checked/>
+                            <label class="form-check-label text-light" asp-for="RememberMe"> </label>
+                        </div>
+                </div>
+
+                 <div class="row justify-content-center">
+                    <button type="submit" class="btn bg-custom text-light border-light border-1 btn-block mb-4 w-25">Sign in</button>
+                 </div>
+            </form>
+        </div>
+    </div>
+</div>
